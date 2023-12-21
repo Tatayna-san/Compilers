@@ -1,0 +1,343 @@
+%{
+	public StatementNode root;
+    public Parser(AbstractScanner<ValueType, LexLocation> scanner) : base(scanner) { }
+%}
+
+%output = SimpleYacc.cs
+
+%union { 
+	public float fVal; 
+	public int iVal; 
+	public char sVal;
+	public string tVal;
+	public string idVal;
+	public Node nVal;
+	public TypeNode typeVal;
+	public ExprNode eVal;
+	public StatementNode stVal;
+	public BlockNode blVal;
+	public ExprListNode elVal;
+}
+
+%using ProgramTree;
+
+
+%namespace SimpleParser
+
+%token ID COLON SEMICOLON ASSIGN COMMA RANGE PLUS MINUS MULT DIVISION MOD DIV MULTASSIGN DIVISIONASSIGN PLUSASSIGN MINUSASSIGN DIVASSIGN MODASSIGN AND OR NOT LT GT LEQ GEQ EQ NEQ WHILE FOR IF ELSE BEGIN END FUNCTION LEFT_BRACKET RIGHT_BRACKET LEFT_SQUARE_BRACKET RIGHT_SQUARE_BRACKET INT FLOAT SYMBOL TEXT
+%token <iVal> INT_VAL
+%token <fVal> FLOAT_VAL
+%token <sVal> SYMBOL_VAL
+%token <tVal> TEXT_VAL
+%token <idVal> ID
+
+%type <typeVal> type
+%type <eVal> ident ret_params template_params params param template_param func_call templ_args decl expr comp_term term factor value range_st
+%type <stVal> func_decl assign_st if_st while_st for_st var_decl statement
+%type <blVal> st_f_list block st_list
+%type <elVal> params_list template_params_list term_list decl_list expr_list
+
+
+%%
+
+progr   : st_f_list { root = $1; }
+		;
+
+st_f_list	: st_f_list var_decl SEMICOLON { 
+				$1.Add($2); 
+				$$ = $1; 
+			}
+			| st_f_list func_decl { 
+				$1.Add($2); 
+				$$ = $1; 
+			}
+			| var_decl SEMICOLON {	
+				$$ = new BlockNode($1); 
+			}
+			| func_decl {	
+				$$ = new BlockNode($1); 
+			}
+
+			;
+
+block	: BEGIN st_list END { $$ = $2; }
+		| BEGIN END
+		;
+
+st_list	: st_list statement { 
+			$1.Add($2); 
+			$$ = $1; 
+		}
+		| statement {	
+			$$ = new BlockNode($1); 
+		}
+		;
+
+statement	: func_call SEMICOLON { $$ = new FucnCallStatementNode($1 as FuncCallNode); }
+			| var_decl SEMICOLON { $$ = $1; }
+			| assign_st SEMICOLON { $$ = $1; }
+			| if_st { $$ = $1; }
+			| while_st { $$ = $1; }
+			| for_st { $$ = $1; }
+			;
+
+ident	: ID { $$ = new IdNode($1); }
+		;
+
+func_decl	: FUNCTION ident params ret_params template_params block {
+				$$ = new FuncDeclNode($2  as IdNode, $6, $3, $4, $5);
+			}
+			| FUNCTION ident params ret_params block {
+				$$ = new FuncDeclNode($2 as IdNode, $5, $3, $4, null);
+			}
+			| FUNCTION ident params template_params block {
+				$$ = new FuncDeclNode($2 as IdNode, $5, $3, null, $4);
+			}
+			| FUNCTION ident params block  {
+				$$ = new FuncDeclNode($2 as IdNode, $4, $3, null, null);
+			}
+			;
+
+params	: LEFT_BRACKET params_list RIGHT_BRACKET {
+			$$ = new ParamsNode($2);
+		}
+		| LEFT_BRACKET RIGHT_BRACKET {
+			$$ = new ParamsNode(null);
+		}
+		;
+
+ret_params	: LEFT_SQUARE_BRACKET params_list RIGHT_SQUARE_BRACKET {
+				$$ = new RetParamsNode($2);
+			}
+			| LEFT_SQUARE_BRACKET RIGHT_SQUARE_BRACKET {
+				$$ = new RetParamsNode(null);
+			}
+			;
+
+template_params	: LT template_params_list GT {
+					$$ = new TemplateParamsNode($2);
+				}
+				| LT GT {
+					$$ = new TemplateParamsNode(null);
+				}
+				;
+
+params_list	: params_list COMMA param { 
+				$1.Add($3); 
+				$$ = $1; 
+			}
+			| param { 
+				$$ = new ExprListNode($1); 
+			}
+			;
+
+param	: type ident {
+			$$ = new ParamNode($1, $2 as IdNode);
+		}
+		;
+
+template_params_list	: template_params_list COMMA template_param { 
+							$1.Add($3); 
+							$$ = $1; 
+						}
+						| template_param { 
+							$$ = new ExprListNode($1); 
+						}
+						;
+
+template_param	: type ident ASSIGN term {
+					$$ = new TemplateParamVarNode($1, $2 as IdNode, $4);
+				}
+				| FUNCTION ident ASSIGN ident {
+					$$ = new TemplateParamFunctionVarNode($2 as IdNode, $4 as IdNode);
+				}
+				;
+
+func_call	: ident LEFT_BRACKET expr_list RIGHT_BRACKET templ_args {
+				$$ = new FuncCallNode($1 as IdNode, $3 as ExprListNode, $5 as TemplArgsNode);
+			}
+			| ident LEFT_BRACKET expr_list RIGHT_BRACKET {
+				$$ = new FuncCallNode($1 as IdNode, $3 as ExprListNode, null);
+			}
+			| ident LEFT_BRACKET RIGHT_BRACKET templ_args {
+				$$ = new FuncCallNode($1 as IdNode, null, $4 as TemplArgsNode);
+			}
+			| ident LEFT_BRACKET RIGHT_BRACKET {
+				$$ = new FuncCallNode($1 as IdNode, null, null);
+			}
+			;
+
+templ_args	: LT term_list GT {
+				$$ = new TemplArgsNode($2);
+			}
+			| LT GT {
+				$$ = new TemplArgsNode(null);
+			}
+			;
+
+term_list	: term_list COMMA term { 
+				$1.Add($3); 
+				$$ = $1; 
+			}
+			| term { 
+				$$ = new ExprListNode($1); 
+			}
+			;
+
+var_decl	: type decl_list {
+				$$ = new VariablesDeclNode($1, $2);
+			}
+			;
+
+type	: INT { $$ = new IntTypeNode(); }
+		| FLOAT { $$ = new FloatTypeNode(); }
+		| TEXT { $$ = new TextTypeNode(); }
+		| SYMBOL { $$ = new SymbolTypeNode(); }
+		;
+
+decl_list	: decl_list COMMA decl { 
+				$1.Add($3); 
+				$$ = $1; 
+			}
+			| decl { 
+				$$ = new ExprListNode($1); 
+			}
+			;
+
+decl	: ident {
+			$$ = new DeclNode($1 as IdNode, null);
+		}
+		| assign_st {
+			$$ = new DeclNode(null, $1 as AssignNode);
+		}
+		;
+
+expr_list	: expr_list COMMA expr { 
+				$1.Add($3); 
+				$$ = $1; 
+			}
+			| expr { 
+				$$ = new ExprListNode($1); 
+			}
+			;
+
+assign_st	: ident ASSIGN expr {
+				$$ = new AssignNode($1 as IdNode, $3);
+			}
+			;
+
+expr	: expr AND comp_term {
+			$$ = new BinaryNode($1, BinaryOperation.AND, $3);
+		}
+		| expr OR comp_term {
+			$$ = new BinaryNode($1, BinaryOperation.OR, $3);
+		}
+		| comp_term {
+			$$ = $1;
+		}
+		;
+
+comp_term	: comp_term LT term {
+				$$ = new BinaryNode($1, BinaryOperation.LT, $3);
+			}
+			| comp_term GT term {
+				$$ = new BinaryNode($1, BinaryOperation.GT, $3);
+			}
+			| comp_term LEQ term {
+				$$ = new BinaryNode($1, BinaryOperation.LEQ, $3);
+			}
+			| comp_term GEQ term {
+				$$ = new BinaryNode($1, BinaryOperation.GEQ, $3);
+			}
+			| comp_term EQ term {
+				$$ = new BinaryNode($1, BinaryOperation.EQ, $3);
+			}
+			| comp_term NEQ term {
+				$$ = new BinaryNode($1, BinaryOperation.NEQ, $3);
+			}
+			| term {
+				$$ = $1;
+			}
+			;
+
+term	: term PLUS factor {
+			$$ = new BinaryNode($1, BinaryOperation.PLUS, $3);
+		}
+		| term MINUS factor {
+			$$ = new BinaryNode($1, BinaryOperation.MINUS, $3);
+		}
+		| factor {
+			$$ = $1;
+		}
+		;
+
+factor	: factor MULT value {
+			$$ = new BinaryNode($1, BinaryOperation.MULT, $3);
+		}
+		| factor DIVISION value {
+			$$ = new BinaryNode($1, BinaryOperation.DIVISION, $3);
+		}
+		| factor MOD value {
+			$$ = new BinaryNode($1, BinaryOperation.MOD, $3);
+		}
+		| factor DIV value {
+			$$ = new BinaryNode($1, BinaryOperation.DIV, $3);
+		}
+		| value {
+			$$ = $1;
+		}
+		;
+
+value	: ident {
+			$$ = $1;
+		}
+		| INT_VAL {
+			$$ = new IntValueNode($1);
+		}
+		| FLOAT_VAL {
+			$$ = new FloatValueNode($1); 
+		}
+		| SYMBOL_VAL {
+			$$ = new SymbolValueNode($1); 
+		}
+		| TEXT_VAL {
+			$$ = new TextValueNode($1); 
+		}
+		| LEFT_BRACKET expr RIGHT_BRACKET {
+			$$ = $2;
+		}
+		| func_call {
+			$$ = $1;
+		}
+		| NOT factor {
+			$$ = new UnaryNode(UnaryOperation.NOT, $2);
+		}
+		| MINUS factor {
+			$$ = new UnaryNode(UnaryOperation.MINUS, $2);
+		}
+		;
+
+if_st	: IF LEFT_BRACKET expr RIGHT_BRACKET block ELSE block {
+			$$ = new IfNode($3, $5, $7);
+		}
+		| IF LEFT_BRACKET expr RIGHT_BRACKET block {
+			$$ = new IfNode($3, $5, null);
+		}
+		;
+
+while_st	: WHILE LEFT_BRACKET expr RIGHT_BRACKET block {
+				$$ = new WhileNode($3, $5);
+			}
+			;
+
+for_st	: FOR LEFT_BRACKET ident ASSIGN range_st RIGHT_BRACKET block {
+			$$ = new ForNode($3 as IdNode, $5 as RangeNode, $7);
+		}
+		;
+
+range_st	: term RANGE term {
+				$$ = new RangeNode($1, $3);
+			}
+			;
+
+%%
