@@ -6,7 +6,6 @@ using System.IO;
 
 namespace SimpleLexer
 {
-
     public class LexerException : System.Exception
     {
         public LexerException(string msg)
@@ -25,58 +24,47 @@ namespace SimpleLexer
         ASSIGN,
         COMMA,
         RANGE,
-
         PLUS,
         MINUS,
         MULT,
         DIVISION,
         MOD,
         DIV,
-
         MULTASSIGN,
         DIVISIONASSIGN,
         PLUSASSIGN,
         MINUSASSIGN,
         DIVASSIGN,
         MODASSIGN,
-
         AND,
         OR,
         NOT,
-
         LT,  //lesser
         GT,  //greater
         LEQ, //less or equal
         GEQ, //greater or equal
         EQ,  //equal
         NEQ, //not equal
-
         WHILE,
         FOR,
         IF,
         ELSE,
-        //CYCLE,
-        //DO,
-        //TO,
-        //THEN,
         BEGIN,
         END,
         FUNCTION,
-
         LEFT_BRACKET,
         RIGHT_BRACKET,
         LEFT_SQUARE_BRACKET,
         RIGHT_SQUARE_BRACKET,
-
         INT,
         FLOAT,
         SYMBOL,
         TEXT,
-
         INT_VAL,
         FLOAT_VAL,
         SYMBOL_VAL,
-        TEXT_VAL
+        TEXT_VAL,
+        BYTE   // Add byte
     }
 
      public class Lexer
@@ -96,7 +84,6 @@ namespace SimpleLexer
 
         private string CurrentLineText;  // Накапливает символы текущей строки для сообщений об ошибках
         
-
         public Lexer(TextReader input)
         {
             CurrentLineText = "";
@@ -108,9 +95,7 @@ namespace SimpleLexer
             NextLexem();    // Считать первую лексему, заполнив LexText, LexKind и, возможно, LexValue
         }
 
-        public void Init() {
-
-        }
+        public void Init() { }
 
         private void PassSpaces()
         {
@@ -137,6 +122,7 @@ namespace SimpleLexer
             keywordsMap["else"] = Tok.ELSE;
             keywordsMap["while"] = Tok.WHILE;
             keywordsMap["for"] = Tok.FOR;
+            keywordsMap["byte"] = Tok.BYTE; // Add Byte
         }
 
         public string FinishCurrentLine()
