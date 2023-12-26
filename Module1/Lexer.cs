@@ -14,7 +14,6 @@ namespace Lexer
             : base(msg)
         {
         }
-
     }
 
     public class Lexer
@@ -140,7 +139,6 @@ namespace Lexer
             }
             return true;
         }
-       
     }
 
     public class IntNoZeroLexer : IntLexer

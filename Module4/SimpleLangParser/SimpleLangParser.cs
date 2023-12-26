@@ -6,10 +6,7 @@ namespace SimpleLangParser
 {
     public class ParserException : System.Exception
     {
-        public ParserException(string msg)
-            : base(msg)
-        {
-        }
+        public ParserException(string msg) : base(msg){}
 
     }
 
@@ -439,6 +436,7 @@ namespace SimpleLangParser
             Block();
             l.NextLexem();
         }
+
         public void SyntaxError(string message) 
         {
             var errorMessage = "Syntax error in line " + l.LexRow.ToString() + ":\n";

@@ -5,7 +5,6 @@ using ScannerHelper;
 
 namespace GeneratedLexer
 {
-
     class mymain
     {
         static void Main(string[] args)
@@ -68,7 +67,6 @@ namespace GeneratedLexer
 
                     break;
                 }
-
                 Console.WriteLine(scanner.TokToString((Tok)tok));
             } while (true);
 

@@ -5,8 +5,7 @@ using ScannerHelper;
 using System.Collections.Generic;
 
 namespace  GeneratedLexer
-{
-    
+{ 
     public class LexerAddon
     {
         public Scanner myScanner;
@@ -19,7 +18,6 @@ namespace  GeneratedLexer
         public int sumInt = 0;
         public double sumDouble = 0.0;
         public List<string> idsInComment = new List<string>();
-        
 
         public LexerAddon(string programText)
         {
