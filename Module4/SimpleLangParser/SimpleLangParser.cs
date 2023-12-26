@@ -372,6 +372,11 @@ namespace SimpleLangParser
                 l.NextLexem();
                 Factor();
             }
+            // Add byte
+            else if (l.LexKind == Tok.BYTE)
+            {
+                l.NextLexem();
+            } 
         }
 
         private void OpFactor()
