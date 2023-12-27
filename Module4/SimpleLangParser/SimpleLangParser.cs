@@ -72,7 +72,8 @@ namespace SimpleLangParser
 
         bool IsType(Tok tok)
         {
-            return tok == Tok.INT || tok == Tok.FLOAT || tok == Tok.SYMBOL || tok == Tok.TEXT;
+            // Add byte
+            return tok == Tok.INT || tok == Tok.FLOAT || tok == Tok.SYMBOL || tok == Tok.TEXT || tok == Tok.BYTE;
         }
 
         private void ParamsList()
