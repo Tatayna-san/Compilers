@@ -3,9 +3,9 @@
 // (see accompanying GPPGcopyright.rtf)
 
 // GPPG version 1.3.6
-// Machine:  DESKTOP-TPAIPAV
-// DateTime: 16.10.2023 21:28:11
-// UserName: ymayma
+// Machine:  STANYA17
+// DateTime: 29.12.2023 15:44:55
+// UserName: tanyp
 // Input file <SimpleYacc.y>
 
 // options: no-lines gplex
@@ -26,7 +26,8 @@ public enum Tokens {
     GT=25,LEQ=26,GEQ=27,EQ=28,NEQ=29,WHILE=30,
     FOR=31,IF=32,ELSE=33,BEGIN=34,END=35,FUNCTION=36,
     LEFT_BRACKET=37,RIGHT_BRACKET=38,LEFT_SQUARE_BRACKET=39,RIGHT_SQUARE_BRACKET=40,INT=41,FLOAT=42,
-    SYMBOL=43,TEXT=44,INT_VAL=45,FLOAT_VAL=46,SYMBOL_VAL=47,TEXT_VAL=48};
+    SYMBOL=43,TEXT=44,INT_VAL=45,FLOAT_VAL=46,SYMBOL_VAL=47,TEXT_VAL=48,
+    BYTE_VAL=49,BYTE=50};
 
 // Abstract base class for GPLEX scanners
 public abstract class ScanBase : AbstractScanner<int,LexLocation> {
@@ -38,7 +39,7 @@ public abstract class ScanBase : AbstractScanner<int,LexLocation> {
 public class Parser: ShiftReduceParser<int, LexLocation>
 {
   // Verbatim content from SimpleYacc.y
-// Эти объявления добавляются в класс GPPGParser, представляющий собой парсер, генерируемый системой gppg
+// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ GPPGParser, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ gppg
     public Parser(AbstractScanner<int, LexLocation> scanner) : base(scanner) { }
   // End verbatim content from SimpleYacc.y
 
